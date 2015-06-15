@@ -2,7 +2,14 @@ import tornado.ioloop
 import tornado.web
 import os
 import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
 import numpy as np
+import math
+import random
+import datetime 
+import time
+sns.set_style("darkgrid")
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -51,6 +58,56 @@ class DataHandler(tornado.web.RequestHandler):
     def initialize(self, df):
         self.df = df[["X","Y","id","Timestamp","type"]]
 
+class DistanceHandler(tornado.web.RequestHandler):
+
+    def obtainTotalDistanceByUser(self,guest_df):
+        i = 1
+        velocity_list = []
+        guest_matrix = guest_df.values
+        total_distance = 0
+        d = 0
+        v = 0
+        t = 0
+        
+        while i < len(guest_df):
+
+            # Distance math...
+
+            xi = int(guest_matrix[i-1][3])
+            yi = int(guest_matrix[i-1][4])
+
+            xf = int(guest_matrix[i][3])
+            yf = int(guest_matrix[i][4])
+
+            d = math.sqrt(pow((xf-xi),2)+pow((yf-yi),2))
+            total_distance += d
+
+            # Time math
+
+            ti = datetime.datetime.strptime(guest_matrix[i-1][0], '%Y-%m-%d %H:%M:%S')
+            tf = datetime.datetime.strptime(guest_matrix[i][0], '%Y-%m-%d %H:%M:%S')
+            
+            t = (tf-ti).total_seconds()
+            
+            # Velocity math
+            v = d/t
+        
+            velocity_list.append(v)
+            i += 1
+        return total_distance
+        
+    def get(self):
+        df = self.df
+        guest_id = self.get_argument("id", None)
+        guest_id = int(guest_id)
+
+        guest_df = df.loc[df["id"]==guest_id]
+        response = self.obtainTotalDistanceByUser(guest_df)
+        self.write({"response" :response})
+
+    def initialize(self, df):
+        self.df = df
+
 class FilterByCheckin(tornado.web.RequestHandler):
     def get(self):
         num = int(self.get_argument("num"))
@@ -75,6 +132,7 @@ if __name__ == "__main__":
     path = os.path.join(os.path.dirname(__file__), "../../documentation/park-movement-Fri.csv")
     print('loading...')
     df = pd.read_csv(path)
+    # df = df.loc[df["id"]==103006] #temp...
     print('converting time...')
     df["time"] = pd.to_datetime(df.Timestamp, format="%Y-%m-%d %H:%M:%S")
 
@@ -87,6 +145,7 @@ if __name__ == "__main__":
             {"path": settings["static_path"]}),
         (r"/dinoUser", DinoUser),
         (r"/checkins", FilterByCheckin,{"df":df}),
+        (r"/distance", DistanceHandler,{"df":df}),
 
     ], **settings)
     application.listen(8100)

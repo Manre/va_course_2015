@@ -68,6 +68,9 @@ function read_user() {
 
 	scatter.selectAll(".dot").remove();
 	console.log("reading user: " + userId);
+	d3.json("distance?id="+userId, function (e, d) {
+		document.getElementById('userDistance').textContent = userId + ': ' +d.response;
+	});
 	d3.json("data?id="+userId, function (e, d) {
 		draw_guest(d.array);
 	});
@@ -76,7 +79,9 @@ function read_user() {
 
 d3.select("#show_user_path").on("click", read_user);
 
-////////////////////////////////
+/*
+	Checkins
+*/
 
 function get_checkins(){
 	var g_data;
