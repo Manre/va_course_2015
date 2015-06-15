@@ -1,0 +1,20 @@
+{% extends base.html %}
+{% block content %}
+
+<h1 class="text-center">Tracking guests</h1>
+
+<div id="main_map">
+    <svg width="800" height="800" id="main_svg">
+
+            <image class="background" xlink:href="{{static_url('ParkMap.jpg')}}" x="0" y="0" width="800px" height="800px"/>
+        <rect class="background" width="800px" height="800px" x="0" y="0">
+            </rect>
+
+    </svg>
+</div>
+<div class="dino-control">
+<div id="clock" class="well">Clock</div>
+<button id="show_guest_button" class="btn btn-default">Show Random Guest</button>
+<script type="text/javascript" src="static/js/dino_user.js"></script>
+</div>
+{% end %}

@@ -8,6 +8,10 @@ class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("dino_map.html")
 
+class DinoUser(tornado.web.RequestHandler):
+    def get(self):
+        self.render("dino_user.html")
+
 class DinoFilter(tornado.web.RequestHandler):
     def get(self):
         self.render("dino_filter.html")
@@ -54,9 +58,10 @@ settings = {"template_path" : os.path.dirname(__file__),
             } 
 
 if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(__file__), "../../MC1 2015 Data/park-movement-Fri.csv")
+    path = os.path.join(os.path.dirname(__file__), "../../documentation/park-movement-Fri.min.csv")
     print('loading...')
     df = pd.read_csv(path)
+    print('converting time...')
     df["time"] = pd.to_datetime(df.Timestamp, format="%Y-%m-%d %H:%M:%S")
 
     application = tornado.web.Application([
@@ -65,7 +70,8 @@ if __name__ == "__main__":
         (r"/filter", DinoFilter),
         (r"/filter_data", FilterData,{"df":df}),
         (r"/static/(.*)", tornado.web.StaticFileHandler,
-            {"path": settings["static_path"]})
+            {"path": settings["static_path"]}),
+        (r"/dinoUser", DinoUser),
 
     ], **settings)
     application.listen(8100)
