@@ -58,7 +58,7 @@ settings = {"template_path" : os.path.dirname(__file__),
             } 
 
 if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(__file__), "../../documentation/park-movement-Fri.min.csv")
+    path = os.path.join(os.path.dirname(__file__), "../../documentation/park-movement-Fri.csv")
     print('loading...')
     df = pd.read_csv(path)
     print('converting time...')
