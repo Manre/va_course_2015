@@ -1,7 +1,7 @@
 {% extends base.html %}
 {% block content %}
 
-<h1 class="text-center">Tracking guests</h1>
+<h1 class="text-center">Tracking Single User</h1>
 
 <div id="main_map">
 	<svg width="800" height="800" id="main_svg">
@@ -16,11 +16,23 @@
 	
 
 	<div class="form-group">
+		<h2>Single User</h2>
 		<div id="clock" class="well">Clock</div>
 		<label for="userIdTitle">User ID</label>
 		<input type="text" class="form-control" name="userId" id="userId" placeholder="Please write the user ID...">
 		<button id="show_user_path" class="btn btn-default">Show User Path</button>
-	</div>	
+	</div>
+	<div class="form-group">
+		<h2>Instructions</h2>
+		<ol>
+			<li> Define the number of check-ins you want to find</li>
+		</ol>
+		<h3>Check-ins</h3>
+		<input type="text" class="form-control" id="checkInNumber" placeholder="Less than...">
+		<button id="show_less_check_in" class="btn btn-default">Show users with less checkins</button>
+		<h3>Users List</h3>
+		<div id="subjects_list" class="well"></div>
+	</div>
 	
 	<script type="text/javascript" src="static/js/dino_user.js"></script>
 </div>

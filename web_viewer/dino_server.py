@@ -51,6 +51,20 @@ class DataHandler(tornado.web.RequestHandler):
     def initialize(self, df):
         self.df = df[["X","Y","id","Timestamp","type"]]
 
+class FilterByCheckin(tornado.web.RequestHandler):
+    def get(self):
+        num = int(self.get_argument("num"))
+        df = self.df
+        # From the notebook
+        checkin_filter = df['type'] == 'check-in'
+        checkin_df = df[checkin_filter]
+        groupUserCheckin = checkin_df['id'].value_counts()
+        
+        checkInFiltered = groupUserCheckin[groupUserCheckin < num]
+        checkin_df = pd.DataFrame(checkInFiltered, columns=['number'])
+        self.write({"checkins" :checkin_df.to_dict()})
+    def initialize(self, df):
+        self.df = df
 
 settings = {"template_path" : os.path.dirname(__file__),
             "static_path" : os.path.join(os.path.dirname(__file__),"static"),
@@ -72,6 +86,7 @@ if __name__ == "__main__":
         (r"/static/(.*)", tornado.web.StaticFileHandler,
             {"path": settings["static_path"]}),
         (r"/dinoUser", DinoUser),
+        (r"/checkins", FilterByCheckin,{"df":df}),
 
     ], **settings)
     application.listen(8100)
