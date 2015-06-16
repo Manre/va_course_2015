@@ -11,6 +11,10 @@ class MainHandler(tornado.web.RequestHandler):
 class DinoFilter(tornado.web.RequestHandler):
     def get(self):
         self.render("dino_filter.html")
+		
+class DinoCheckinvsDuracion(tornado.web.RequestHandler):
+    def get(self):
+        self.render("dino_checkinduracion.html")
 
 class FilterData(tornado.web.RequestHandler):
     def get(self):
@@ -47,6 +51,27 @@ class DataHandler(tornado.web.RequestHandler):
     def initialize(self, df):
         self.df = df[["X","Y","id","Timestamp","type"]]
 
+class checkinduracion(tornado.web.RequestHandler):
+    def get(self):
+        df = self.df
+        # from the notebook
+        checkin_data = df.loc[df["type"] == "check-in"]
+        checkin_grouped = checkin_data.groupby("id")["time"].count()
+        entrada_grouped = df.groupby("id")["time"].min()
+        salida_grouped = df.groupby("id")["time"].max()
+        entrada_grouped = pd.DataFrame(entrada_grouped)
+        salida_grouped = pd.DataFrame(salida_grouped)
+        checkin_grouped = pd.DataFrame(checkin_grouped)
+        result = pd.concat([salida_grouped, entrada_grouped, checkin_grouped], axis=1)
+        result.columns = ['horaEntrada', 'horaSalida', 'numCheckin']
+        result['duracion'] = (result['horaEntrada'].dt.hour + result['horaEntrada'].dt.minute/60) - (result['horaSalida'].dt.hour + result['horaSalida'].dt.minute/60)
+        result = result.drop('horaEntrada', 1)
+        result = result.drop('horaSalida', 1)
+        result_list = result.to_dict("registros")
+        self.write({"rows" :result_list})
+        
+    def initialize(self, df):
+        self.df = df   
 
 settings = {"template_path" : os.path.dirname(__file__),
             "static_path" : os.path.join(os.path.dirname(__file__),"static"),
@@ -63,6 +88,8 @@ if __name__ == "__main__":
         (r"/", MainHandler),
         (r"/data", DataHandler,{"df":df}),
         (r"/filter", DinoFilter),
+        (r"/CheckinvsDuracion", DinoCheckinvsDuracion),
+        (r"/checkin_dur", checkinduracion,{"df":df}),
         (r"/filter_data", FilterData,{"df":df}),
         (r"/static/(.*)", tornado.web.StaticFileHandler,
             {"path": settings["static_path"]})
