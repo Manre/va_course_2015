@@ -64,12 +64,21 @@ function draw_guest(array) {
 }
 
 function read_user() {
-	var userId = document.getElementById('userId').value;
+	var userId;
+	var x=d3.select("#subjects_list").selectAll("input").filter(function(){return this.checked})[0];
+    var guests = x.map(function(i){return i.value});
+    
+    if (guests.length > 0) {
+    	userId = guests[0].split('-')[0];
+    }
+    else{
+		userId = document.getElementById('userId').value;
+    }
 
-	scatter.selectAll(".dot").remove();
+    scatter.selectAll(".dot").remove();
 	console.log("reading user: " + userId);
 	d3.json("distance?id="+userId, function (e, d) {
-		document.getElementById('userDistance').textContent = userId + ': ' +d.response;
+		document.getElementById('userDistance').textContent = 'The distance walked by the user was: ' + d.response;
 	});
 	d3.json("data?id="+userId, function (e, d) {
 		draw_guest(d.array);
