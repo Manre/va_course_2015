@@ -129,7 +129,7 @@ settings = {"template_path" : os.path.dirname(__file__),
             } 
 
 if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(__file__), "../../documentation/park-movement-Fri.csv")
+    path = os.path.join(os.path.dirname(__file__), "C:/MC1 2015 Data/park-movement-Fri.csv")
     print('loading...')
     df = pd.read_csv(path)
     # df = df.loc[df["id"]==103006] #temp...
