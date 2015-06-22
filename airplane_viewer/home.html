@@ -1,47 +1,73 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <script src="{{static_url('js/jquery-1.11.3.min.js')}}"></script>
-    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
-    <script src="{{static_url('js/d3.min.js')}}"></script>
-    <script src="{{static_url('js/colorbrewer.js')}}"></script>
-    <link rel="stylesheet" type="text/css" href="{{static_url('css/bootstrap.min.css')}}" />
-    <link rel="stylesheet" type="text/css" href="{{static_url('css/custom.css')}}" />
-    <title>DinoFun analytics</title>
-</head>
-<body>
-<nav class="navbar navbar-default">
-  <div class="container-fluid container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">DinoFun World Analytics</a>
+	<head>
+			<script src="{{static_url('js/jquery-1.11.3.min.js')}}"></script>
+			<script src="{{static_url('js/bootstrap.min.js')}}"></script>
+			<script src="{{static_url('js/d3.min.js')}}"></script>
+			<script src="http://code.highcharts.com/highcharts.js"></script>
+			<script src="http://code.highcharts.com/modules/exporting.js"></script>
+			<title>DinoFun analytics</title>
+			<script type="text/javascript">
+			
+			$(document).ready(function() {
+				url = 'http://localhost:8100/YearVsFatalities';
+				years = 'sin instanciar';
 
-    </div>
+				var options = {
+					chart: {
+						renderTo: 'container',
+						type: 'spline'
+					},
+					title: {
+							text: '',
+							x: -20 //center
+					},
+					subtitle: {
+							text: '',
+							x: -20 //center
+					},
+					xAxis: {
+							categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+									'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+					},
+					yAxis: {
+							title: {
+									text: 'Temperature (°C)'
+							},
+							plotLines: [{
+									value: 0,
+									width: 1,
+									color: '#808080'
+							}]
+					},
+					tooltip: {
+							valueSuffix: '°C'
+					},
+					legend: {
+							layout: 'vertical',
+							align: 'right',
+							verticalAlign: 'middle',
+							borderWidth: 0
+					},
+					series: [{}]
+				};
 
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home</a></li>
-          <li class="active"><a href="/filter">Filters</a></li>
-          </ul>
+				$.getJSON(url, function(data) {
+					// Variable data will have the JSON information
+					options.xAxis.categories = data.index;
+					options.series[0].data = data.data;
+					options.title.text = 'Blablabla';
+					options.title.x = -20; //center
+					options.subtitle.text = 'Source: blablabla.com';
+					options.subtitle.x = -20; //center
+					var chart = new Highcharts.Chart(options);
+				});
 
-
-      <ul class="nav navbar-nav navbar-right">
-          <li><a href="http://guainia.uniandes.edu.co/dinofunworld/" target="_blank">Park Website</a></li>
-          <li><a href="http://vacommunity.org/2015+VAST+Challenge%3A+MC1" target="_blank">Vast challenge 2015-MC1</a></li>
-      </ul>
-
-    </div>
-  </div>
-</nav>
-
-<div class="container">
-{% block content %}
-{% end %}
-    </div>
-</body>
+			});
+			
+			</script>
+	</head>
+	<body>
+		<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+	</body>
 </html>

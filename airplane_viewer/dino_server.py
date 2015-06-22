@@ -9,6 +9,7 @@ import random
 import math
 import datetime 
 import time
+import json
 sns.set_style("darkgrid")
 
 class MainHandler(tornado.web.RequestHandler):
@@ -44,11 +45,11 @@ class FatalitiesHandler(tornado.web.RequestHandler):
 class YearVsFatalitiesHandler(tornado.web.RequestHandler):
 	def get(self):
 		
-		group_year_agg_fatalities = df.groupby(['Year']).agg('sum')['Fatalities']
+		group_year_agg_fatalities = df.groupby(['Year']).agg('sum')['Fatalities'].astype('int')
 		fatalities_df = pd.DataFrame(group_year_agg_fatalities)
 		result = pd.concat([fatalities_df], axis=1, join='inner' )
 		
-		self.write({"data" : result.to_dict() })
+		self.write(json.loads(result.to_json(orient='split')))
 
 	def initialize(self, df):
 		self.df = df
@@ -121,7 +122,7 @@ settings = {"template_path" : os.path.dirname(__file__),
 			} 
 
 if __name__ == "__main__":
-	path = os.path.join(os.path.dirname(__file__), "../documentation/data/Airplane_Crashes_and_Fatalities_Since_1908.csv")
+	path = os.path.join(os.path.dirname(__file__), "../../documentation/data/Airplane_Crashes_and_Fatalities_Since_1908.csv")
 	print('loading...')
 	df = pd.read_csv(path)
 	print('Removing columns...')
