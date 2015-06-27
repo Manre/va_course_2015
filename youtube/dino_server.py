@@ -23,8 +23,9 @@ class CalculatorHandler(tornado.web.RequestHandler):
 	def get(self):
 
 		grupoCategoria = int(self.get_argument("grupoCategoria")) #2
-		categoriaOriginal = self.get_argument("categoriaOriginal") #'People & Blogs'
-		numSegundos = self.get_argument("numSegundos") #100
+		categoriaOriginal = str(self.get_argument("categoriaOriginal")) #'People & Blogs'
+		categoriaOriginal = categoriaOriginal.replace(" and ", " & ");
+		numSegundos = int(self.get_argument("numSegundos")) #100
 
 		path = os.path.join(os.path.dirname(__file__), "../../documentation/data/youtube/0.txt")
 		df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 3, 4, 5])
@@ -35,7 +36,7 @@ class CalculatorHandler(tornado.web.RequestHandler):
 		rng = RandomState(42)
 		kmeans = KMeans(n_clusters=3, random_state=rng).fit(arr_data)
 		arr_datf = pd.DataFrame(arr_data)
-		arr_datf['classViews'] = p.labels_
+		arr_datf['classViews'] = kmeans.labels_
 		arr_datf.columns = ['views1', 'classViews']
 		result = pd.concat([df, arr_datf], axis=1)
 		result = result.drop('views1', axis=1)
