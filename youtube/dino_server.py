@@ -35,7 +35,7 @@ class CalculatorHandler(tornado.web.RequestHandler):
 		rng = RandomState(42)
 		kmeans = KMeans(n_clusters=3, random_state=rng).fit(arr_data)
 		arr_datf = pd.DataFrame(arr_data)
-		arr_datf['classViews'] = kmeans.labels_
+		arr_datf['classViews'] = p.labels_
 		arr_datf.columns = ['views1', 'classViews']
 		result = pd.concat([df, arr_datf], axis=1)
 		result = result.drop('views1', axis=1)
@@ -55,6 +55,8 @@ class CategoriesHandler(tornado.web.RequestHandler):
 		return 'Video not found' if tmp.empty else tmp.values[0][3]
 
 	def get(self):
+
+		category = self.get_argument("category") #Comedy
 		
 		for category in categories:
 			matrix_videos = df[df['category'] == category].values
@@ -65,8 +67,12 @@ class CategoriesHandler(tornado.web.RequestHandler):
 					related_video_category = self.findCategoryFrom(related_video)
 					if related_video_category != 'Video not found':
 						categories[category][related_video_category] += 1
+		test = pd.DataFrame(categories)
+		test = test[[category]].values
+		rng = RandomState(42)
+		kmeans = KMeans(n_clusters=3, random_state=rng).fit(test)
 
-		self.write(categories)
+		self.write(json.dumps(kmeans.labels_.tolist()))
 
 	def initialize(self, df):
 		self.df = df
