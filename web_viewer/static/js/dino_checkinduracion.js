@@ -92,23 +92,25 @@
     }
 
 	function show_graph(){
-		scatter.selectAll(".dot").remove();
+		confirm("¡Estoy listo para jugar!");
+		//scatter.selectAll(".dot").remove();
 		console.log("ploting checkin-durations");
 		d3.select("#show_graphic_button").attr("disabled", true);
-		d3.json("checkin_dur", function(e, d) {
-			draw_data(d.array);
-			}); 
-	
+		//d3.json("checkin_dur", function(e, d) {
+		//	draw_data(d.array);
+		//	}); 
+		
+		d3.select("#show_graphic_button").attr("disabled", false);
 	}
 	
-    /* function read_guest() {
-        scatter.selectAll(".dot").remove();
-        console.log("reading guest");
-        d3.select("#show_guest_button").attr("disabled", true);
-        d3.json("data", function (e, d) {
-            draw_guest(d.array);
-        });
-    } */
+    // function read_guest() {
+    //    scatter.selectAll(".dot").remove();
+    //    console.log("reading guest");
+    //    d3.select("#show_guest_button").attr("disabled", true);
+    //    d3.json("data", function (e, d) {
+    //        draw_guest(d.array);
+    //    });
+    //} 
 
     //d3.select("#show_graphic_button").on("click", read_guest);
 	d3.select("#show_graphic_button").on("click", show_graph);
