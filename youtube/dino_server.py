@@ -10,11 +10,44 @@ import math
 import datetime 
 import time
 import json
+from numpy.random import RandomState
+from sklearn.cluster import KMeans
+
 sns.set_style("darkgrid")
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("home.html")
+
+class CalculatorHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		grupoCategoria = int(self.get_argument("grupoCategoria")) #2
+		categoriaOriginal = self.get_argument("categoriaOriginal") #'People & Blogs'
+		numSegundos = self.get_argument("numSegundos") #100
+
+		path = os.path.join(os.path.dirname(__file__), "../../documentation/data/youtube/0.txt")
+		df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 3, 4, 5])
+		df.columns = ['video_ID', 'category', 'length', 'views']
+		df['Url'] = "https://www.youtube.com/watch?v=" + df['video_ID']
+		mean = df[['views']].mean()
+		arr_data = df[['views']].fillna(mean[0]).values
+		rng = RandomState(42)
+		kmeans = KMeans(n_clusters=3, random_state=rng).fit(arr_data)
+		arr_datf = pd.DataFrame(arr_data)
+		arr_datf['classViews'] = kmeans.labels_
+		arr_datf.columns = ['views1', 'classViews']
+		result = pd.concat([df, arr_datf], axis=1)
+		result = result.drop('views1', axis=1)
+		result['classCategory'] = grupoCategoria
+		result = result[result['length'] > numSegundos]
+		result = result[result['category'] == categoriaOriginal]
+		result['total'] = result['classCategory'] * result['classViews']
+		
+		self.write(json.loads(result.to_json(orient='split')))
+
+	def initialize(self, df):
+		self.df = df
 
 class CategoriesHandler(tornado.web.RequestHandler):
 	def findCategoryFrom(self,video):
@@ -71,6 +104,7 @@ if __name__ == "__main__":
 	application = tornado.web.Application([
 		(r"/", MainHandler),
 		(r"/categories", CategoriesHandler,{"df":df}),
+		(r"/calculator", CalculatorHandler,{"df":df}),
 		(r"/static/(.*)", tornado.web.StaticFileHandler,
 			{"path": settings["static_path"]})
 
