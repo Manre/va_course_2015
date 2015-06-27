@@ -57,6 +57,9 @@ class CategoriesHandler(tornado.web.RequestHandler):
 	def get(self):
 
 		category = self.get_argument("category") #Comedy
+		length = int(self.get_argument("length")) #Comedy
+
+		self.df = self.df[df['length']<length]
 		
 		for category in categories:
 			matrix_videos = df[df['category'] == category].values
